@@ -1,4 +1,22 @@
-CREATE 
+ ----------------------------------------------------------------------CREATE------------------------------------------------------------------------------------- 
+
+CREATE TABLE IF NOT EXISTS EntityType (
+    Id SERIAL PRIMARY KEY,
+    entity_type VARCHAR
+);
+CREATE TABLE IF NOT EXISTS Counselee (
+    Id SERIAL PRIMARY KEY,
+    survey_attempted BOOLEAN,
+    subscription_type VARCHAR,
+    start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    end_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS Pastor (
+    Id SERIAL PRIMARY KEY,
+    pastor_description TEXT,
+    duration int
+);
+
 
 CREATE TABLE IF NOT EXISTS User (
     id SERIAL PRIMARY KEY,
@@ -11,36 +29,6 @@ CREATE TABLE IF NOT EXISTS User (
     is_deleted BOOLEAN,
     login_attempt INT,
     terms_and_conditions_accepted BOOLEAN
-);
-
-CREATE TABLE IF NOT EXISTS Counselee (
-    Id SERIAL PRIMARY KEY,
-    survey_attempted BOOLEAN,
-    subscription_type VARCHAR,
-    start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    end_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE IF NOT EXISTS Pastor (
-    Id SERIAL PRIMARY KEY,
-    pastor_description TEXT,
-    duration int
-);
-
-CREATE TABLE IF NOT EXISTS Audit_Log (
-    Id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES User(id) ,
-    event_type VARCHAR,
-    event_name VARCHAR,
-    event_description VARCHAR,
-    created_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    event_Id INT REFERENCES BookingEvent(id)
-);
-
-CREATE TABLE IF NOT EXISTS EntityType (
-    Id SERIAL PRIMARY KEY,
-    entity_type VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS UserEntityAccess (
@@ -61,14 +49,12 @@ CREATE TABLE IF NOT EXISTS Slot (
     is_available BOOLEAN,
     is_closed BOOLEAN
 );
-
 CREATE TABLE IF NOT EXISTS Rating (
     id SERIAL PRIMARY KEY,
     pastor_id INT REFERENCES Pastor(Id),
     rating INT,
     updated_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
 CREATE TABLE IF NOT EXISTS Review (
     id SERIAL PRIMARY KEY,
     reviewed_by INT REFERENCES User(id),
@@ -83,20 +69,47 @@ CREATE TABLE IF NOT EXISTS BookingStatus (
     Id SERIAL PRIMARY KEY,
     status VARCHAR
 );
-
-CREATE TABLE IF NOT EXISTS Session (
-    id SERIAL PRIMARY KEY,
-    event_id INT REFERENCES Event(id),
-    start_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    end_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    plan_id INT REFERENCES Plan(id),
-    is_payment_successful BOOLEAN,
-    status_id INT REFERENCES SessionStatus(id)
-);
-
 CREATE TABLE IF NOT EXISTS SessionStatus (
     id SERIAL PRIMARY KEY,
     status VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS Subscription (
+    Id SERIAL PRIMARY KEY,
+    subscription_plan VARCHAR,
+    subscription_price DECIMAL,
+    is_active BOOLEAN,
+    start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    end_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS UserImage (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES User(id),
+    name VARCHAR,
+    image BYTEA,
+    created_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+CREATE TABLE IF NOT EXISTS CounsellingType (
+    Id SERIAL PRIMARY KEY,
+    counselling_Type VARCHAR
+);
+CREATE TABLE IF NOT EXISTS Plan (
+    id SERIAL PRIMARY KEY,
+    plan_type VARCHAR,
+    planDate TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    plan_name VARCHAR,
+    plan_code VARCHAR,
+    plan_price DECIMAL,
+    is_active BOOLEAN,
+    plan_period INT
+);
+
+CREATE TABLE EmailOtp (
+ Id serial primary key,
+ Email_id  varchar not null,
+ OtpGeneratedTime DATETIME
 );
 
 CREATE TABLE IF NOT EXISTS BookingEvent (
@@ -112,7 +125,6 @@ CREATE TABLE IF NOT EXISTS BookingEvent (
     is_booked BOOLEAN,
     slot_Id INT REFERENCES Slot(Id)
 );
-
 CREATE TABLE IF NOT EXISTS BlockReportHistory (
     id SERIAL PRIMARY KEY,
     created_by INT REFERENCES User(id),
@@ -125,28 +137,25 @@ CREATE TABLE IF NOT EXISTS BlockReportHistory (
     start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     end_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
-
-
-CREATE TABLE IF NOT EXISTS UserImage (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES User(id),
-    name VARCHAR,
-    image BYTEA,
-    created_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
-
-CREATE TABLE IF NOT EXISTS Subscription (
+CREATE TABLE IF NOT EXISTS Audit_Log (
     Id SERIAL PRIMARY KEY,
-    subscription_plan VARCHAR,
-    subscription_price DECIMAL,
-    is_active BOOLEAN,
-    start_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    end_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    user_id INT REFERENCES User(id) ,
+    event_type VARCHAR,
+    event_name VARCHAR,
+    event_description VARCHAR,
+    created_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_Date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    event_Id INT REFERENCES BookingEvent(id)
 );
-
-
+CREATE TABLE IF NOT EXISTS Session (
+    id SERIAL PRIMARY KEY,
+    event_id INT REFERENCES BookingEvent(id),
+    start_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    end_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    plan_id INT REFERENCES Plan(id),
+    is_payment_successful BOOLEAN,
+    status_id INT REFERENCES SessionStatus(id)
+);
 
 CREATE TABLE IF NOT EXISTS Survey (
     id SERIAL PRIMARY KEY,
@@ -156,14 +165,6 @@ CREATE TABLE IF NOT EXISTS Survey (
     counseling_type INT REFERENCES CounsellingType(Id),
     display_order INT
 );
-
-
-
-CREATE TABLE IF NOT EXISTS CounsellingType (
-    Id SERIAL PRIMARY KEY,
-    counselling_Type VARCHAR
-);
-
 
 CREATE TABLE IF NOT EXISTS SurveyResponse (
     Id SERIAL PRIMARY KEY,
@@ -176,52 +177,24 @@ CREATE TABLE IF NOT EXISTS SurveyResponse (
 );
 
 
-
-CREATE TABLE IF NOT EXISTS Plan (
-    id SERIAL PRIMARY KEY,
-    plan_type VARCHAR,
-    planDate TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    plan_name VARCHAR,
-    plan_code VARCHAR,
-    plan_price DECIMAL,
-    is_active BOOLEAN,
-    plan_period INT
-);
-
-CREATE TABLE IF NOT EXISTS FavouritePastor (
-    id SERIAL PRIMARY KEY,
-    counselee_id INT REFERENCES Counselee(id),
-    pastor_id INT REFERENCES Pastor(Id),
-    updated_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
-
 CREATE TABLE IF NOT EXISTS PaymentDetail (
     Id SERIAL PRIMARY KEY,
-    event_id INT REFERENCES Event(id),
+    event_id INT REFERENCES BookingEvent(id),
     counselee_id INT REFERENCES Counselee(id),
     amount DECIMAL,
     transaction_date TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     payment_method VARCHAR
 );
 
-CREATE TABLE EmailOtp (
- Id serial primary key,
- Email_id  varchar not null,
- OtpGeneratedTime DATETIME
+CREATE TABLE IF NOT EXISTS FavouritePastor (
+    id SERIAL PRIMARY KEY,
+    counselee_id INT REFERENCES Counselee(id),
+    pastor_id INT REFERENCES Pastor(Id),
+    updated_date TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );
 
 
-
-
-
-
-
-
-
-
-
-
--------------------------------------------------------------------------------------------
-              INSERT 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+                                                                         INSERT 
 INSERT INTO ENTITYTYPE VALUES (1, ‘PASTOR’)
 INSERT INTO ENTITYTYPE VALUES (2, ‘COUNSELEE’)
